@@ -2,35 +2,41 @@ const express = require("express");
 const cors = require("cors");
 const ApiError = require("./app/api-error");
 const app = express();
-const bookRouter = require("./app/routes/book.route");
+
+const docgiaRoutes = require("./app/routes/docgia.route");
+const nhaxuatbanRoutes = require("./app/routes/nhaxuatban.route");
+const nhanvienRoutes = require("./app/routes/nhanvien.route");
+const sachRoutes = require("./app/routes/sach.route");
+const theodoiRoutes = require("./app/routes/theodoi.route"); // Import route TheoDoiMuonSach
 
 // Cho phép các yêu cầu từ mọi nguồn
 app.use(cors());
 
-// Sử dụng middleware để parse dữ liệu JSON từ các request
+// Parse JSON
 app.use(express.json());
 
-// Định nghĩa route GET cho đường dẫn gốc ('/')
+// Route mặc định
 app.get("/", (req, res) => {
-  // Trả về một response với dữ liệu JSON
-  res.json({ message: "Welcome to contact book application." });
+  res.json({ message: "Welcome to library management system!" });
 });
-app.use("/api/book", bookRouter);
 
-// Xử lý lỗi 404 (Not Found)
+// Định nghĩa các route
+app.use("/api/docgia", docgiaRoutes);
+app.use("/api/nhaxuatban", nhaxuatbanRoutes);
+app.use("/api/nhanvien", nhanvienRoutes);
+app.use("/api/sach", sachRoutes);
+app.use("/api/theodoi", theodoiRoutes); // Thêm route TheoDoiMuonSach
+
+// Xử lý lỗi 404
 app.use((req, res, next) => {
-  // Code ở đây sẽ chạy khi không có route được định nghĩa nào
-  // khớp với yêu cầu. Gọi next(error) để chuyển sang middleware xử lý lỗi
-  return next(new ApiError(404, "Resource not found"));
+  next(new ApiError(404, "Resource not found"));
 });
 
-// Định nghĩa middleware xử lý lỗi toàn cục
+// Middleware xử lý lỗi toàn cục
 app.use((err, req, res, next) => {
-  // Trong các đoạn code xử lý ở các route, gọi next(error) sẽ chuyển về middleware xử lý lỗi này
-  return res.status(err.statusCode || 500).json({
+  res.status(err.statusCode || 500).json({
     message: err.message || "Internal Server Error",
   });
 });
 
-// Export ứng dụng để sử dụng ở các file khác
 module.exports = app;
