@@ -18,5 +18,7 @@ router.put("/:id", nhanvienController.updateById);
 // Route xóa nhân viên theo ID
 router.delete("/:id", nhanvienController.deleteById);
 
+router.post("/login", nhanvienController.login);
+
 module.exports = router;
 

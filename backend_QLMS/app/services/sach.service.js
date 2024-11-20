@@ -52,6 +52,9 @@ class SachService {
     );
     return result.modifiedCount; // Trả về số bản ghi đã cập nhật
   }
+  async getByMaSach(MaSach) {
+    return await this.Sach.findOne({ MaSach });
+  }
 
   // Xóa một sách theo ID
   async deleteById(id) {

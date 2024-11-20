@@ -1,5 +1,6 @@
 const { ObjectId } = require("mongodb");
 
+
 class NhanvienService {
   constructor(client) {
     this.NhanVien = client.db().collection("NhanVien"); // Liên kết với collection NhanVien
@@ -55,6 +56,31 @@ class NhanvienService {
   async deleteById(id) {
     const result = await this.NhanVien.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount; // Trả về số bản ghi đã xóa
+  }
+
+  async authenticate(MSNV, Password) {
+    try {
+      // Tìm nhân viên dựa trên MSNV
+      const nhanvien = await this.NhanVien.findOne({ MSNV });
+
+      // Nếu không tìm thấy nhân viên
+      if (!nhanvien) {
+        console.log("Employee not found with MSNV:", MSNV);
+        return false;
+      }
+
+      // So sánh mật khẩu trực tiếp (không hash)
+      if (nhanvien.Password !== Password) {
+        console.log("Invalid password for MSNV:", MSNV);
+        return false;
+      }
+
+      // Trả về thông tin nhân viên nếu thông tin hợp lệ
+      return nhanvien;
+    } catch (error) {
+      console.error("Error in authenticate method:", error);
+      throw new Error("An error occurred during authentication");
+    }
   }
 }
 

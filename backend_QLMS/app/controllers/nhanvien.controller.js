@@ -1,6 +1,7 @@
 const NhanvienService = require("../services/nhanvien.service");
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
+const jwt = require("jsonwebtoken"); // Thêm jwt vào để tạo token
 
 exports.create = async (req, res, next) => {
   try {
@@ -70,5 +71,43 @@ exports.deleteById = async (req, res, next) => {
     res.json({ message: "Employee deleted successfully!" });
   } catch (error) {
     next(new ApiError(500, "An error occurred while deleting the employee"));
+  }
+};
+exports.login = async (req, res, next) => {
+  try {
+    const nhanVienService = new NhanvienService(await MongoDB.connect());
+
+    // Xác thực thông tin đăng nhập
+    const user = await nhanVienService.authenticate(
+      req.body.MSNV,
+      req.body.Password
+    );
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Tạo token sử dụng jwt
+    const token = jwt.sign(
+      {
+        id: user._id, // Mã hóa ID nhân viên
+        role: "nhanvien", // Thêm thông tin vai trò
+      },
+      "your_secret_key", // Secret key (nên lưu vào file .env để bảo mật)
+      { expiresIn: "1h" } // Token có thời hạn 1 giờ
+    );
+
+    // Trả về phản hồi bao gồm token
+    res.json({
+      message: "Login successful!",
+      token, // Trả về token cho frontend
+      user: {
+        MSNV: user.MSNV,
+        HoTenNV: user.HoTenNV,
+      },
+    });
+  } catch (error) {
+    console.error("Error details in login:", error); // Log chi tiết lỗi
+    next(new ApiError(500, "An error occurred during login"));
   }
 };

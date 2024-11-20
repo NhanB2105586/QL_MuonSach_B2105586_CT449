@@ -18,4 +18,6 @@ router.put("/:id", theodoiController.updateById);
 // Route xóa bản ghi theo ID
 router.delete("/:id", theodoiController.deleteById);
 
+router.get("/maDocGia/:maDocGia", theodoiController.getByMaDocGia); // Thêm route mới
+
 module.exports = router;

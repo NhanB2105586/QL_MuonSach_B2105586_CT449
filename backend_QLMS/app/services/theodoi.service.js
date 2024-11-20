@@ -56,6 +56,13 @@ class TheodoiService {
     });
     return result.deletedCount; // Trả về số bản ghi đã xóa
   }
+
+  // Lấy danh sách các bản ghi theo dõi của một độc giả cụ thể (dựa trên MaDocGia)
+  async getByMaDocGia(maDocGia) {
+    return await this.TheoDoiMuonSach.find({ MaDocGia: maDocGia }).toArray();
+  }
 }
+
+
 
 module.exports = TheodoiService;
